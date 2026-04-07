@@ -84,3 +84,10 @@ Aplicacao web simples para uma empresa de aluguel de carros, com controle de usu
 
 - O usuario do MySQL precisa ter permissao para CREATE DATABASE e CREATE TABLE para o bootstrap automatico.
 - Para producao, recomenda-se usar servidor web (Apache/Nginx) e variaveis de ambiente seguras.
+
+  ## Equipe e Atribuições
+
+* **Letícia Carvalho:** Arquitetura de Banco de Dados (MySQL) e Planejamento do Módulo de Locação.
+* **Lucas Viana da Silva:** Desenvolvimento de Scripts PHP (Insert) e Configuração do Ambiente/Infraestrutura.
+* **Rafael da Silva Rabelo:** Desenvolvimento do Front-end e Criação de Formulários HTML/Bootstrap.
+* **Aryane Cassimiro Machado:** Implementação das funcionalidades de Listagem e Exclusão (Backend PHP).
