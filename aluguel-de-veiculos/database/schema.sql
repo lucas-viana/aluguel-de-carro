@@ -17,6 +17,7 @@ CREATE TABLE usuarios (
     email VARCHAR(120) NOT NULL,
     senha VARCHAR(255) NOT NULL,
     endereco VARCHAR(255) NOT NULL,
+    tipo ENUM('admin','comum') NOT NULL DEFAULT 'comum',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_usuarios_cpf (cpf),
     UNIQUE KEY uq_usuarios_email (email)

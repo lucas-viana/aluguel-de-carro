@@ -9,6 +9,6 @@ session_unset();
 session_destroy();
 
 // Redireciona o usuário para a tela de login ou index
-header("Location: login.php");
+header('Location: index.php?route=login');
 exit();
 ?>

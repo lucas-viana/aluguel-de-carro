@@ -53,6 +53,17 @@
                         <?php if (isset($errors['endereco'])): ?><div class="invalid-feedback d-block"><?php echo h($errors['endereco']); ?></div><?php endif; ?>
                     </div>
 
+                    <?php if ($isAdmin): ?>
+                    <div class="mb-3">
+                        <label for="tipo" class="form-label">Tipo de Usuario</label>
+                        <select class="form-select" id="tipo" name="tipo">
+                            <option value="comum" <?php echo ($formData['tipo'] ?? 'comum') === 'comum' ? 'selected' : ''; ?>>Comum</option>
+                            <option value="admin" <?php echo ($formData['tipo'] ?? '') === 'admin' ? 'selected' : ''; ?>>Administrador</option>
+                        </select>
+                        <?php if (isset($errors['tipo'])): ?><div class="invalid-feedback d-block"><?php echo h($errors['tipo']); ?></div><?php endif; ?>
+                    </div>
+                    <?php endif; ?>
+
                     <button type="submit" class="btn btn-brand w-100">Salvar Usuario</button>
                 </form>
             </div>
@@ -77,7 +88,7 @@
                                     <th>Nome</th>
                                     <th>CPF</th>
                                     <th>E-mail</th>
-                                    <th>Telefone</th>
+                                    <th>Tipo</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -88,8 +99,14 @@
                                         <td><?php echo h($usuario['nome_completo']); ?></td>
                                         <td><?php echo h($usuario['cpf']); ?></td>
                                         <td><?php echo h($usuario['email']); ?></td>
-                                        <td><?php echo h($usuario['telefone']); ?></td>
+                                        <td>
+                                            <span class="badge <?php echo $usuario['tipo'] === 'admin' ? 'bg-danger' : 'bg-secondary'; ?>">
+                                                <?php echo h(ucfirst($usuario['tipo'])); ?>
+                                            </span>
+                                        </td>
                                         <td class="text-end">
+                                            <a href="index.php?route=usuarios/edit&id=<?php echo h((string) $usuario['id']); ?>"
+                                               class="btn btn-sm btn-outline-primary me-1">Editar</a>
                                             <form method="post" class="d-inline" onsubmit="return confirm('Deseja realmente excluir este usuario?');">
                                                 <input type="hidden" name="action" value="delete">
                                                 <input type="hidden" name="id" value="<?php echo h((string) $usuario['id']); ?>">
