@@ -20,6 +20,7 @@ class UsuarioController extends Controller
             'data_nascimento' => '',
             'telefone' => '',
             'email' => '',
+            'senha' => '',
             'endereco' => '',
         ];
         $errors = [];

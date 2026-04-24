@@ -42,6 +42,12 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="senha" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="senha" name="senha" required minlength="6">
+                        <?php if (isset($errors['senha'])): ?><div class="invalid-feedback d-block"><?php echo h($errors['senha']); ?></div><?php endif; ?>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="endereco" class="form-label">Endereco</label>
                         <textarea class="form-control" id="endereco" name="endereco" rows="3" required minlength="5" maxlength="255"><?php echo h($formData['endereco']); ?></textarea>
                         <?php if (isset($errors['endereco'])): ?><div class="invalid-feedback d-block"><?php echo h($errors['endereco']); ?></div><?php endif; ?>
