@@ -52,7 +52,7 @@ class AluguelController extends Controller
                         $domainErrors = $aluguelModel->create($clean);
 
                         if (empty($domainErrors)) {
-                            setFlash('success', 'Aluguel criado com sucesso e veiculo marcado como alugado.');
+                            setFlash('success', 'Aluguel registrado com sucesso.');
                             redirect('index.php?route=alugueis');
                         }
 
@@ -78,6 +78,8 @@ class AluguelController extends Controller
                         setFlash('success', 'Aluguel finalizado e veiculo liberado para novo aluguel.');
                     } elseif ($result === 'not_found') {
                         setFlash('warning', 'Aluguel nao encontrado.');
+                    } elseif ($result === 'not_started') {
+                        setFlash('warning', 'Este aluguel ainda nao iniciou e nao pode ser finalizado.');
                     } else {
                         setFlash('warning', 'Este aluguel ja foi finalizado.');
                     }
@@ -96,7 +98,7 @@ class AluguelController extends Controller
                 $aluguelModel = new AluguelModel($pdo);
 
                 $usuarios = $usuarioModel->listBasic();
-                $veiculosDisponiveis = $veiculoModel->listAvailable();
+                $veiculosDisponiveis = $veiculoModel->listForRental();
                 $alugueis = $aluguelModel->listAll();
             } catch (PDOException $exception) {
                 $databaseReady = false;

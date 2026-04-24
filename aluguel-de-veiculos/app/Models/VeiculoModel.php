@@ -53,5 +53,10 @@ class VeiculoModel
     {
         return $this->pdo->query('SELECT id, modelo, fabricante, placa FROM veiculos WHERE disponivel = 1 ORDER BY modelo')->fetchAll();
     }
+
+    public function listForRental(): array
+    {
+        return $this->pdo->query('SELECT id, modelo, fabricante, placa, disponivel FROM veiculos ORDER BY modelo')->fetchAll();
+    }
 }
 

@@ -11,10 +11,14 @@
                 <?php if (!$databaseReady): ?>
                     <div class="alert alert-warning"><?php echo h($dbErrorMessage); ?></div>
                 <?php elseif (empty($usuarios) || empty($veiculosDisponiveis)): ?>
-                    <div class="alert alert-info py-2">Cadastre ao menos 1 usuario e 1 veiculo disponivel para criar um aluguel.</div>
+                    <div class="alert alert-info py-2">Cadastre ao menos 1 usuario e 1 veiculo para criar um aluguel.</div>
                 <?php else: ?>
                     <form method="post" data-validate="aluguel" novalidate>
                         <input type="hidden" name="action" value="create">
+
+                        <div class="alert alert-info py-2">
+                            O mesmo veiculo pode ser alugado novamente somente com intervalo minimo de 2 dias apos a data de entrega anterior.
+                        </div>
 
                         <div class="mb-3">
                             <label for="usuario_id" class="form-label">Usuario</label>
@@ -30,12 +34,13 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="veiculo_id" class="form-label">Veiculo Disponivel</label>
+                            <label for="veiculo_id" class="form-label">Veiculo</label>
                             <select class="form-select" id="veiculo_id" name="veiculo_id" required>
                                 <option value="">Selecione um veiculo</option>
                                 <?php foreach ($veiculosDisponiveis as $veiculo): ?>
                                     <option value="<?php echo h((string) $veiculo['id']); ?>" <?php echo (string) $formData['veiculo_id'] === (string) $veiculo['id'] ? 'selected' : ''; ?>>
                                         <?php echo h($veiculo['fabricante'] . ' ' . $veiculo['modelo'] . ' - ' . $veiculo['placa']); ?>
+                                        <?php echo (int) $veiculo['disponivel'] === 1 ? '' : ' (indisponivel hoje)'; ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -97,6 +102,7 @@
                             </thead>
                             <tbody>
                                 <?php foreach ($alugueis as $aluguel): ?>
+                                    <?php $isFutureRental = $aluguel['status'] === 'ativo' && $aluguel['data_retirada'] > (new DateTimeImmutable('today'))->format('Y-m-d'); ?>
                                     <tr>
                                         <td><?php echo h((string) $aluguel['id']); ?></td>
                                         <td><?php echo h($aluguel['usuario']); ?></td>
@@ -104,19 +110,23 @@
                                         <td><?php echo h($aluguel['data_retirada']); ?></td>
                                         <td><?php echo h($aluguel['data_entrega']); ?></td>
                                         <td>
-                                            <?php if ($aluguel['status'] === 'ativo'): ?>
+                                            <?php if ($isFutureRental): ?>
+                                                <span class="badge text-bg-info">Agendado</span>
+                                            <?php elseif ($aluguel['status'] === 'ativo'): ?>
                                                 <span class="badge text-bg-warning">Ativo</span>
                                             <?php else: ?>
                                                 <span class="badge text-bg-success">Finalizado</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-end">
-                                            <?php if ($aluguel['status'] === 'ativo'): ?>
+                                            <?php if ($aluguel['status'] === 'ativo' && !$isFutureRental): ?>
                                                 <form method="post" class="d-inline" onsubmit="return confirm('Finalizar este aluguel?');">
                                                     <input type="hidden" name="action" value="finalizar">
                                                     <input type="hidden" name="id" value="<?php echo h((string) $aluguel['id']); ?>">
                                                     <button type="submit" class="btn btn-sm btn-outline-success">Finalizar</button>
                                                 </form>
+                                            <?php elseif ($isFutureRental): ?>
+                                                <small class="text-secondary">Inicio em <?php echo h($aluguel['data_retirada']); ?></small>
                                             <?php else: ?>
                                                 <small class="text-secondary">Finalizado em <?php echo h((string) $aluguel['finalizado_em']); ?></small>
                                             <?php endif; ?>

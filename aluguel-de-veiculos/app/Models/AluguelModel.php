@@ -7,6 +7,8 @@ use PDO;
 
 class AluguelModel
 {
+    private const MIN_DAYS_BETWEEN_RENTALS = 2;
+
     public function __construct(private PDO $pdo)
     {
     }
@@ -32,8 +34,17 @@ class AluguelModel
 
             if (!$veiculo) {
                 $errors['veiculo_id'] = 'Veiculo selecionado nao existe.';
-            } elseif ((int) $veiculo['disponivel'] !== 1) {
-                $errors['veiculo_id'] = 'Este veiculo nao esta disponivel para aluguel.';
+            }
+
+            if ($veiculo && $this->hasDateConflict(
+                (int) $data['veiculo_id'],
+                (string) $data['data_retirada'],
+                (string) $data['data_entrega']
+            )) {
+                $errors['veiculo_id'] = sprintf(
+                    'Este veiculo exige intervalo minimo de %d dias entre alugueis. Escolha outro periodo.',
+                    self::MIN_DAYS_BETWEEN_RENTALS
+                );
             }
 
             if (!empty($errors)) {
@@ -66,7 +77,7 @@ class AluguelModel
         $this->pdo->beginTransaction();
 
         try {
-            $aluguelStmt = $this->pdo->prepare('SELECT id, veiculo_id, status FROM alugueis WHERE id = :id FOR UPDATE');
+            $aluguelStmt = $this->pdo->prepare('SELECT id, veiculo_id, status, data_retirada FROM alugueis WHERE id = :id FOR UPDATE');
             $aluguelStmt->execute(['id' => $aluguelId]);
             $aluguel = $aluguelStmt->fetch();
 
@@ -78,6 +89,11 @@ class AluguelModel
             if ($aluguel['status'] !== 'ativo') {
                 $this->pdo->rollBack();
                 return 'already_done';
+            }
+
+            if ($aluguel['data_retirada'] > (new \DateTimeImmutable('today'))->format('Y-m-d')) {
+                $this->pdo->rollBack();
+                return 'not_started';
             }
 
             $finalizaAluguel = $this->pdo->prepare("UPDATE alugueis SET status = 'finalizado', finalizado_em = NOW() WHERE id = :id");
@@ -115,5 +131,24 @@ class AluguelModel
             INNER JOIN veiculos v ON v.id = a.veiculo_id
             ORDER BY a.id DESC"
         )->fetchAll();
+    }
+
+    private function hasDateConflict(int $veiculoId, string $dataRetirada, string $dataEntrega): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COUNT(*)
+             FROM alugueis
+             WHERE veiculo_id = :veiculo_id
+             AND data_retirada < DATE_ADD(:nova_entrega, INTERVAL :intervalo_fim DAY)
+             AND :nova_retirada < DATE_ADD(data_entrega, INTERVAL :intervalo_inicio DAY)'
+        );
+        $stmt->bindValue(':veiculo_id', $veiculoId, PDO::PARAM_INT);
+        $stmt->bindValue(':nova_retirada', $dataRetirada);
+        $stmt->bindValue(':nova_entrega', $dataEntrega);
+         $stmt->bindValue(':intervalo_fim', self::MIN_DAYS_BETWEEN_RENTALS, PDO::PARAM_INT);
+         $stmt->bindValue(':intervalo_inicio', self::MIN_DAYS_BETWEEN_RENTALS, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn() > 0;
     }
 }
