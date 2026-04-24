@@ -9,18 +9,25 @@ use App\Controllers\DashboardController;
 use App\Controllers\UsuarioController;
 use App\Controllers\VeiculoController;
 use App\Core\Router;
+use App\Middleware\AuthMiddleware;
 
 $route = (string) ($_GET['route'] ?? 'dashboard');
 
 $router = new Router();
-$router->add('GET', 'dashboard', [DashboardController::class, 'index']);
-$router->add('GET', 'usuarios', [UsuarioController::class, 'index']);
-$router->add('POST', 'usuarios', [UsuarioController::class, 'index']);
-$router->add('GET', 'veiculos', [VeiculoController::class, 'index']);
-$router->add('POST', 'veiculos', [VeiculoController::class, 'index']);
-$router->add('GET', 'alugueis', [AluguelController::class, 'index']);
-$router->add('POST', 'alugueis', [AluguelController::class, 'index']);
-$router->add('GET', 'login', [AuthController::class, 'login']);
+
+// Rotas protegidas — exigem autenticação via AuthMiddleware
+$auth = [AuthMiddleware::class];
+
+$router->add('GET',  'dashboard', [DashboardController::class, 'index'], $auth);
+$router->add('GET',  'usuarios',  [UsuarioController::class,  'index'], $auth);
+$router->add('POST', 'usuarios',  [UsuarioController::class,  'index'], $auth);
+$router->add('GET',  'veiculos',  [VeiculoController::class,  'index'], $auth);
+$router->add('POST', 'veiculos',  [VeiculoController::class,  'index'], $auth);
+$router->add('GET',  'alugueis', [AluguelController::class,  'index'], $auth);
+$router->add('POST', 'alugueis', [AluguelController::class,  'index'], $auth);
+
+// Rotas públicas — sem middleware
+$router->add('GET',  'login', [AuthController::class, 'login']);
 $router->add('POST', 'login', [AuthController::class, 'login']);
 
 $router->dispatch((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'), $route);
