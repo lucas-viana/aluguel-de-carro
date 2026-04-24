@@ -175,7 +175,7 @@
         <div class="login-footer">
             <p>
                 Nao tem uma conta?
-                <a href="index.php">Retornar ao dashboard</a>
+                <a href="index.php?route=register">Cadastre-se</a>
             </p>
         </div>
     </div>

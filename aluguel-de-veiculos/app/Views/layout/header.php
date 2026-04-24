@@ -32,11 +32,28 @@ $flashTypeMap = [
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
-            <ul class="navbar-nav ms-auto gap-lg-2">
-                <li class="nav-item"><a class="nav-link" href="index.php?route=dashboard">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="index.php?route=usuarios">Usuarios</a></li>
-                <li class="nav-item"><a class="nav-link" href="index.php?route=veiculos">Veiculos</a></li>
+            <ul class="navbar-nav ms-auto gap-lg-2 align-items-lg-center">
+                <?php if (($_SESSION['usuario_tipo'] ?? '') === 'admin'): ?>
+                    <li class="nav-item"><a class="nav-link" href="index.php?route=dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.php?route=usuarios">Usuarios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.php?route=veiculos">Veiculos</a></li>
+                <?php endif; ?>
                 <li class="nav-item"><a class="nav-link" href="index.php?route=alugueis">Alugueis</a></li>
+                <?php if (isset($_SESSION['usuario_nome'])): ?>
+                    <li class="nav-item d-flex align-items-center gap-2 ms-lg-2">
+                        <?php $tipo = $_SESSION['usuario_tipo'] ?? 'comum'; ?>
+                        <span class="badge <?php echo $tipo === 'admin' ? 'bg-danger' : 'bg-secondary'; ?>">
+                            <?php echo h(ucfirst($tipo)); ?>
+                        </span>
+                        <span class="nav-link text-muted px-0" style="cursor:default;">
+                            <?php echo h($_SESSION['usuario_nome']); ?>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-sm btn-outline-danger px-3" href="logout.php"
+                           onclick="return confirm('Deseja realmente sair?');">Sair</a>
+                    </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>

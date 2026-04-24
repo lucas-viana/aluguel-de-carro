@@ -14,14 +14,17 @@ class UsuarioController extends Controller
     {
         startSessionIfNeeded();
 
+        $isAdmin = ($_SESSION['usuario_tipo'] ?? '') === 'admin';
+
         $formData = [
-            'nome_completo' => '',
-            'cpf' => '',
+            'nome_completo'   => '',
+            'cpf'             => '',
             'data_nascimento' => '',
-            'telefone' => '',
-            'email' => '',
-            'senha' => '',
-            'endereco' => '',
+            'telefone'        => '',
+            'email'           => '',
+            'senha'           => '',
+            'endereco'        => '',
+            'tipo'            => 'comum',
         ];
         $errors = [];
         $usuarios = [];
@@ -41,13 +44,12 @@ class UsuarioController extends Controller
             $action = $_POST['action'] ?? '';
 
             if ($action === 'create') {
-                [$clean, $errors] = validateUsuario($_POST);
-                $formData = array_merge($formData, $clean);
+                [$clean, $errors] = validateUsuario($_POST, $isAdmin);
+                $formData = array_merge($formData, array_map('strval', $clean));
 
                 if (empty($errors)) {
                     try {
                         $model->create($clean);
-
                         setFlash('success', 'Usuario cadastrado com sucesso.');
                         redirect('index.php?route=usuarios');
                     } catch (PDOException $exception) {
@@ -93,18 +95,85 @@ class UsuarioController extends Controller
                 $usuarios = (new UsuarioModel($pdo))->listAll();
             } catch (PDOException $exception) {
                 $databaseReady = false;
-                $dbErrorMessage = 'Nao foi possivel inicializar o banco automaticamente. Verifique permissao de acesso e credenciais do MySQL.';
+                $dbErrorMessage = 'Nao foi possivel carregar usuarios. Verifique permissao de acesso e credenciais do MySQL.';
             }
         }
 
         $this->render('usuarios/index', [
-            'pageTitle' => 'Usuarios',
-            'formData' => $formData,
-            'errors' => $errors,
-            'usuarios' => $usuarios,
-            'databaseReady' => $databaseReady,
+            'pageTitle'      => 'Usuarios',
+            'formData'       => $formData,
+            'errors'         => $errors,
+            'usuarios'       => $usuarios,
+            'isAdmin'        => $isAdmin,
+            'databaseReady'  => $databaseReady,
+            'dbErrorMessage' => $dbErrorMessage,
+        ]);
+    }
+
+    public function edit(): void
+    {
+        startSessionIfNeeded();
+
+        $isAdmin = ($_SESSION['usuario_tipo'] ?? '') === 'admin';
+        $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
+
+        if ($id === false || $id <= 0) {
+            setFlash('error', 'Usuario invalido.');
+            redirect('index.php?route=usuarios');
+        }
+
+        $errors = [];
+        $databaseReady = true;
+        $dbErrorMessage = '';
+        $pdo = null;
+        $usuario = null;
+
+        try {
+            $pdo = getConnection();
+        } catch (PDOException $exception) {
+            $databaseReady = false;
+            $dbErrorMessage = 'Falha na conexao com o MySQL.';
+        }
+
+        if ($databaseReady && $pdo instanceof PDO) {
+            $model = new UsuarioModel($pdo);
+
+            $usuario = $model->findById($id);
+
+            if (!$usuario) {
+                setFlash('error', 'Usuario nao encontrado.');
+                redirect('index.php?route=usuarios');
+            }
+
+            if (isPostRequest() && ($_POST['action'] ?? '') === 'edit') {
+                [$clean, $errors] = validateUsuarioEdit($_POST, $isAdmin);
+
+                if (empty($errors)) {
+                    try {
+                        $model->update($id, $clean);
+                        setFlash('success', 'Usuario atualizado com sucesso.');
+                        redirect('index.php?route=usuarios');
+                    } catch (PDOException $exception) {
+                        if ($exception->getCode() === '23000') {
+                            $errors['geral'] = 'CPF ou e-mail ja cadastrado.';
+                        } else {
+                            $errors['geral'] = 'Erro ao atualizar usuario.';
+                        }
+                    }
+                }
+
+                // Re-merge os dados submetidos para repopular o formulário
+                $usuario = array_merge($usuario, $_POST);
+            }
+        }
+
+        $this->render('usuarios/edit', [
+            'pageTitle'      => 'Editar Usuario',
+            'usuario'        => $usuario,
+            'errors'         => $errors,
+            'isAdmin'        => $isAdmin,
+            'databaseReady'  => $databaseReady,
             'dbErrorMessage' => $dbErrorMessage,
         ]);
     }
 }
-

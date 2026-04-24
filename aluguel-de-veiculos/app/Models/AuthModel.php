@@ -13,7 +13,7 @@ class AuthModel
 
     public function findUserByEmail(string $email): array|false
     {
-        $stmt = $this->pdo->prepare('SELECT id, nome_completo, email, senha FROM usuarios WHERE email = :email LIMIT 1');
+        $stmt = $this->pdo->prepare('SELECT id, nome_completo, email, senha, tipo FROM usuarios WHERE email = :email LIMIT 1');
         $stmt->execute(['email' => $email]);
 
         return $stmt->fetch();

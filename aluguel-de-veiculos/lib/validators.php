@@ -45,17 +45,18 @@ function isValidCPF(string $cpf): bool
     return $isValid;
 }
 
-function validateUsuario(array $input): array
+function validateUsuario(array $input, bool $adminCreating = false): array
 {
     $errors = [];
 
-    $nomeCompleto = trim((string) ($input['nome_completo'] ?? ''));
-    $cpf = digitsOnly((string) ($input['cpf'] ?? ''));
+    $nomeCompleto   = trim((string) ($input['nome_completo'] ?? ''));
+    $cpf            = digitsOnly((string) ($input['cpf'] ?? ''));
     $dataNascimento = trim((string) ($input['data_nascimento'] ?? ''));
-    $telefone = digitsOnly((string) ($input['telefone'] ?? ''));
-    $email = trim((string) ($input['email'] ?? ''));
-    $senha = (string) ($input['senha'] ?? '');
-    $endereco = trim((string) ($input['endereco'] ?? ''));
+    $telefone       = digitsOnly((string) ($input['telefone'] ?? ''));
+    $email          = trim((string) ($input['email'] ?? ''));
+    $senha          = (string) ($input['senha'] ?? '');
+    $endereco       = trim((string) ($input['endereco'] ?? ''));
+    $tipo           = trim((string) ($input['tipo'] ?? 'comum'));
 
     if ($nomeCompleto === '' || strlen($nomeCompleto) < 3 || strlen($nomeCompleto) > 120) {
         $errors['nome_completo'] = 'Nome completo deve conter entre 3 e 120 caracteres.';
@@ -87,18 +88,89 @@ function validateUsuario(array $input): array
         $errors['senha'] = 'Senha deve conter no minimo 6 caracteres.';
     }
 
+    // Somente admin pode definir tipo; auto-registro sempre cria como 'comum'
+    if (!$adminCreating || !in_array($tipo, ['admin', 'comum'], true)) {
+        $tipo = 'comum';
+    }
+
     return [
         [
-            'nome_completo' => $nomeCompleto,
-            'cpf' => $cpf,
+            'nome_completo'   => $nomeCompleto,
+            'cpf'             => $cpf,
             'data_nascimento' => $dataNascimento,
-            'telefone' => $telefone,
-            'email' => $email,
-            'senha' => password_hash($senha, PASSWORD_BCRYPT),
-            'endereco' => $endereco,
+            'telefone'        => $telefone,
+            'email'           => $email,
+            'senha'           => password_hash($senha, PASSWORD_BCRYPT),
+            'endereco'        => $endereco,
+            'tipo'            => $tipo,
         ],
         $errors,
     ];
+}
+
+function validateUsuarioEdit(array $input, bool $adminEditing = false): array
+{
+    $errors = [];
+
+    $nomeCompleto   = trim((string) ($input['nome_completo'] ?? ''));
+    $cpf            = digitsOnly((string) ($input['cpf'] ?? ''));
+    $dataNascimento = trim((string) ($input['data_nascimento'] ?? ''));
+    $telefone       = digitsOnly((string) ($input['telefone'] ?? ''));
+    $email          = trim((string) ($input['email'] ?? ''));
+    $senha          = (string) ($input['senha'] ?? '');
+    $endereco       = trim((string) ($input['endereco'] ?? ''));
+    $tipo           = trim((string) ($input['tipo'] ?? 'comum'));
+
+    if ($nomeCompleto === '' || strlen($nomeCompleto) < 3 || strlen($nomeCompleto) > 120) {
+        $errors['nome_completo'] = 'Nome completo deve conter entre 3 e 120 caracteres.';
+    }
+
+    if (!isValidCPF($cpf)) {
+        $errors['cpf'] = 'CPF invalido.';
+    }
+
+    if (!validateDateYmd($dataNascimento)) {
+        $errors['data_nascimento'] = 'Data de nascimento invalida.';
+    } elseif ($dataNascimento > (new DateTimeImmutable('today'))->format('Y-m-d')) {
+        $errors['data_nascimento'] = 'Data de nascimento nao pode estar no futuro.';
+    }
+
+    if (strlen($telefone) < 10 || strlen($telefone) > 11) {
+        $errors['telefone'] = 'Telefone deve conter DDD + numero (10 ou 11 digitos).';
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'E-mail invalido.';
+    }
+
+    if ($endereco === '' || strlen($endereco) < 5 || strlen($endereco) > 255) {
+        $errors['endereco'] = 'Endereco deve conter entre 5 e 255 caracteres.';
+    }
+
+    // Senha é opcional na edição; se preenchida, valida o tamanho
+    if ($senha !== '' && strlen($senha) < 6) {
+        $errors['senha'] = 'Nova senha deve conter no minimo 6 caracteres.';
+    }
+
+    if (!$adminEditing || !in_array($tipo, ['admin', 'comum'], true)) {
+        $tipo = 'comum';
+    }
+
+    $clean = [
+        'nome_completo'   => $nomeCompleto,
+        'cpf'             => $cpf,
+        'data_nascimento' => $dataNascimento,
+        'telefone'        => $telefone,
+        'email'           => $email,
+        'endereco'        => $endereco,
+        'tipo'            => $tipo,
+    ];
+
+    if ($senha !== '') {
+        $clean['senha'] = password_hash($senha, PASSWORD_BCRYPT);
+    }
+
+    return [$clean, $errors];
 }
 
 function normalizePlaca(string $placa): string
