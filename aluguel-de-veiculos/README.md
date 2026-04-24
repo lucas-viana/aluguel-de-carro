@@ -35,13 +35,14 @@ Aplicacao web simples para uma empresa de aluguel de carros, com controle de usu
 - Regras de negocio para impedir aluguel de veiculo indisponivel.
 - Uso de prepared statements (PDO) para evitar SQL Injection.
 
-## Estrutura
+## Estrutura (MVC)
 
-- index.php: dashboard
-- usuarios.php: cadastro/listagem/exclusao de usuarios
-- veiculos.php: cadastro/listagem/controle de disponibilidade
-- alugueis.php: criacao e finalizacao de alugueis
-- config/database.php: conexao PDO
+- index.php: front controller e roteador da aplicacao
+- app/Core: classes base de bootstrap, roteamento e renderizacao
+- app/Controllers: controle de fluxo HTTP por modulo
+- app/Models: acesso a dados e regras de persistencia
+- app/Views: templates de apresentacao (layout e telas)
+- config/database.php: conexao PDO e bootstrap de schema/seed
 - lib/helpers.php: funcoes utilitarias
 - lib/validators.php: validadores de entrada
 - database/schema.sql: script de criacao do banco

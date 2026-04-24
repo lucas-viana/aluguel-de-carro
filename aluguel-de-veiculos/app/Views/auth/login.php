@@ -1,76 +1,3 @@
-<?php
-declare(strict_types=1);
-
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/lib/helpers.php';
-require_once __DIR__ . '/lib/validators.php';
-
-startSessionIfNeeded();
-
-if (isset($_SESSION['usuario_id'])) {
-    redirect('index.php');
-}
-
-$email = '';
-$senha = '';
-$errors = [];
-$databaseReady = true;
-$dbErrorMessage = '';
-$pdo = null;
-
-try {
-    $pdo = getConnection();
-} catch (PDOException $exception) {
-    $databaseReady = false;
-    $dbErrorMessage = 'Falha na conexao com o MySQL. Verifique DB_HOST, DB_NAME, DB_USER e DB_PASS.';
-}
-
-if ($databaseReady && $pdo instanceof PDO && isPostRequest()) {
-    $email = trim($_POST['email'] ?? '');
-    $senha = $_POST['senha'] ?? '';
-
-    if (empty($email)) {
-        $errors['email'] = 'Email é obrigatório.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors['email'] = 'Email inválido.';
-    }
-
-    if (empty($senha)) {
-        $errors['senha'] = 'Senha é obrigatória.';
-    }
-
-    if (empty($errors)) {
-        try {
-
-            // TODO: CONECTAR COM O BANCO
-            // 1. Buscar usuário na tabela 'usuarios' pelo email
-            // 2. Comparar a senha fornecida com a senha armazenada (usar password_verify)
-            // 3. Se válido, armazenar usuario_id na sessão
-            // 4. Redirecionar para index.php
-            
-            $stmt = $pdo->prepare('SELECT id, nome_completo, email, senha FROM usuarios WHERE email = :email LIMIT 1');
-            $stmt->execute(['email' => $email]);
-            $usuario = $stmt->fetch();
-
-            if ($usuario && password_verify($senha, $usuario['senha'])) {
-
-                $_SESSION['usuario_id'] = $usuario['id'];
-                $_SESSION['usuario_nome'] = $usuario['nome_completo'];
-
-                setFlash('success', 'Login realizado com sucesso!');
-                redirect('index.php');
-            } else {
-
-                $errors['geral'] = 'Email ou senha incorretos.';
-            }
-        } catch (PDOException $exception) {
-            $errors['geral'] = 'Erro ao processar login. Tente novamente.';
-        }
-    }
-}
-
-$pageTitle = 'Login - Sistema de Aluguel de Veiculos';
-?>
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -197,7 +124,7 @@ $pageTitle = 'Login - Sistema de Aluguel de Veiculos';
     <div class="login-card">
         <div class="login-header">
             <h1>RentCar</h1>
-            <p>Sistema de Aluguel de Veículos</p>
+            <p>Sistema de Aluguel de Veiculos</p>
         </div>
 
         <?php if (!empty($errors['geral'])): ?>
@@ -206,7 +133,7 @@ $pageTitle = 'Login - Sistema de Aluguel de Veiculos';
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="login.php" novalidate>
+        <form method="POST" action="index.php?route=login" novalidate>
             <div class="form-group">
                 <label for="email" class="form-label">Email</label>
                 <input
@@ -247,7 +174,7 @@ $pageTitle = 'Login - Sistema de Aluguel de Veiculos';
 
         <div class="login-footer">
             <p>
-                Não tem uma conta? 
+                Nao tem uma conta?
                 <a href="index.php">Retornar ao dashboard</a>
             </p>
         </div>
@@ -260,3 +187,4 @@ $pageTitle = 'Login - Sistema de Aluguel de Veiculos';
 <script src="assets/js/validation.js"></script>
 </body>
 </html>
+

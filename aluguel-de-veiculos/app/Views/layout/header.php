@@ -33,10 +33,10 @@ $flashTypeMap = [
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto gap-lg-2">
-                <li class="nav-item"><a class="nav-link" href="index.php">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="usuarios.php">Usuarios</a></li>
-                <li class="nav-item"><a class="nav-link" href="veiculos.php">Veiculos</a></li>
-                <li class="nav-item"><a class="nav-link" href="alugueis.php">Alugueis</a></li>
+                <li class="nav-item"><a class="nav-link" href="index.php?route=dashboard">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="index.php?route=usuarios">Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link" href="index.php?route=veiculos">Veiculos</a></li>
+                <li class="nav-item"><a class="nav-link" href="index.php?route=alugueis">Alugueis</a></li>
             </ul>
         </div>
     </div>
