@@ -8,13 +8,13 @@ TRUNCATE TABLE veiculos;
 TRUNCATE TABLE usuarios;
 SET FOREIGN_KEY_CHECKS = 1;
 
-INSERT INTO usuarios (id, nome_completo, cpf, data_nascimento, telefone, email, endereco) VALUES
-(1, 'Lucas Almeida', '52998224725', '1991-04-10', '11987654321', 'lucas.almeida@email.com', 'Rua das Acacias, 120 - Sao Paulo/SP'),
-(2, 'Mariana Costa', '12345678909', '1994-11-22', '11991234567', 'mariana.costa@email.com', 'Av. Paulista, 900 - Sao Paulo/SP'),
-(3, 'Rafael Souza', '11144477735', '1988-02-03', '21999887766', 'rafael.souza@email.com', 'Rua Voluntarios da Patria, 45 - Rio de Janeiro/RJ'),
-(4, 'Camila Pereira', '86288366757', '1996-07-15', '31988776655', 'camila.pereira@email.com', 'Rua da Bahia, 1500 - Belo Horizonte/MG'),
-(5, 'Bruno Martins', '93541134780', '1990-09-28', '41977665544', 'bruno.martins@email.com', 'Rua XV de Novembro, 222 - Curitiba/PR'),
-(6, 'Ana Beatriz Lima', '29537914800', '1999-01-19', '71966554433', 'ana.lima@email.com', 'Rua Chile, 340 - Salvador/BA');
+INSERT INTO usuarios (id, nome_completo, cpf, data_nascimento, telefone, email, senha, endereco) VALUES
+(1, 'Lucas Almeida', '52998224725', '1991-04-10', '11987654321', 'lucas.almeida@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Rua das Acacias, 120 - Sao Paulo/SP'),
+(2, 'Mariana Costa', '12345678909', '1994-11-22', '11991234567', 'mariana.costa@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Av. Paulista, 900 - Sao Paulo/SP'),
+(3, 'Rafael Souza', '11144477735', '1988-02-03', '21999887766', 'rafael.souza@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Rua Voluntarios da Patria, 45 - Rio de Janeiro/RJ'),
+(4, 'Camila Pereira', '86288366757', '1996-07-15', '31988776655', 'camila.pereira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Rua da Bahia, 1500 - Belo Horizonte/MG'),
+(5, 'Bruno Martins', '93541134780', '1990-09-28', '41977665544', 'bruno.martins@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Rua XV de Novembro, 222 - Curitiba/PR'),
+(6, 'Ana Beatriz Lima', '29537914800', '1999-01-19', '71966554433', 'ana.lima@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Rua Chile, 340 - Salvador/BA');
 
 INSERT INTO veiculos (id, modelo, cor, fabricante, placa, disponivel) VALUES
 (1, 'Corolla XEi', 'Prata', 'Toyota', 'ABC1D23', 0),

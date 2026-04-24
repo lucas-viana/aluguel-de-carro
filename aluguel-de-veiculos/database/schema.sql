@@ -15,6 +15,7 @@ CREATE TABLE usuarios (
     data_nascimento DATE NOT NULL,
     telefone VARCHAR(11) NOT NULL,
     email VARCHAR(120) NOT NULL,
+    senha VARCHAR(255) NOT NULL,
     endereco VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_usuarios_cpf (cpf),

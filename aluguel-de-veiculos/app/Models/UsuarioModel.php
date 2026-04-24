@@ -14,7 +14,7 @@ class UsuarioModel
     public function create(array $data): void
     {
         $stmt = $this->pdo->prepare(
-            'INSERT INTO usuarios (nome_completo, cpf, data_nascimento, telefone, email, endereco) VALUES (:nome_completo, :cpf, :data_nascimento, :telefone, :email, :endereco)'
+            'INSERT INTO usuarios (nome_completo, cpf, data_nascimento, telefone, email, senha, endereco) VALUES (:nome_completo, :cpf, :data_nascimento, :telefone, :email, :senha, :endereco)'
         );
         $stmt->execute($data);
     }

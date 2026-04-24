@@ -54,6 +54,7 @@ function validateUsuario(array $input): array
     $dataNascimento = trim((string) ($input['data_nascimento'] ?? ''));
     $telefone = digitsOnly((string) ($input['telefone'] ?? ''));
     $email = trim((string) ($input['email'] ?? ''));
+    $senha = (string) ($input['senha'] ?? '');
     $endereco = trim((string) ($input['endereco'] ?? ''));
 
     if ($nomeCompleto === '' || strlen($nomeCompleto) < 3 || strlen($nomeCompleto) > 120) {
@@ -82,6 +83,10 @@ function validateUsuario(array $input): array
         $errors['endereco'] = 'Endereco deve conter entre 5 e 255 caracteres.';
     }
 
+    if ($senha === '' || strlen($senha) < 6) {
+        $errors['senha'] = 'Senha deve conter no minimo 6 caracteres.';
+    }
+
     return [
         [
             'nome_completo' => $nomeCompleto,
@@ -89,6 +94,7 @@ function validateUsuario(array $input): array
             'data_nascimento' => $dataNascimento,
             'telefone' => $telefone,
             'email' => $email,
+            'senha' => password_hash($senha, PASSWORD_BCRYPT),
             'endereco' => $endereco,
         ],
         $errors,
