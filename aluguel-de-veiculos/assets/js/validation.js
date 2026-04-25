@@ -5,42 +5,12 @@ document.addEventListener('DOMContentLoaded', function () {
         return value.replace(/\D+/g, '');
     }
 
-    function isValidCPF(cpf) {
-        cpf = onlyDigits(cpf);
 
-        if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
-            return false;
-        }
-
-        for (var length = 9; length < 11; length++) {
-            var sum = 0;
-
-            for (var i = 0; i < length; i++) {
-                sum += parseInt(cpf.charAt(i), 10) * ((length + 1) - i);
-            }
-
-            var digit = ((10 * sum) % 11) % 10;
-            if (digit !== parseInt(cpf.charAt(length), 10)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     var cpfInput = document.querySelector('input[data-mask="cpf"]');
     if (cpfInput) {
         cpfInput.addEventListener('input', function () {
-            var digits = onlyDigits(cpfInput.value).slice(0, 11);
-            cpfInput.value = digits;
-        });
-
-        cpfInput.addEventListener('blur', function () {
-            if (cpfInput.value && !isValidCPF(cpfInput.value)) {
-                cpfInput.setCustomValidity('CPF invalido.');
-            } else {
-                cpfInput.setCustomValidity('');
-            }
+            cpfInput.value = onlyDigits(cpfInput.value).slice(0, 11);
         });
     }
 

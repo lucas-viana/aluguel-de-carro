@@ -12,38 +12,7 @@ function validateDateYmd(string $date): bool
     return $parsed !== false && $parsed->format('Y-m-d') === $date;
 }
 
-function isValidCPF(string $cpf): bool
-{
-    $cpf = digitsOnly($cpf);
-    $isValid = true;
 
-    if (strlen($cpf) !== 11) {
-        $isValid = false;
-    }
-
-    if ($isValid && preg_match('/^(\d)\1{10}$/', $cpf) === 1) {
-        $isValid = false;
-    }
-
-    if ($isValid) {
-        for ($length = 9; $length < 11; $length++) {
-            $sum = 0;
-
-            for ($i = 0; $i < $length; $i++) {
-                $sum += ((int) $cpf[$i]) * (($length + 1) - $i);
-            }
-
-            $digit = ((10 * $sum) % 11) % 10;
-
-            if ((int) $cpf[$length] !== $digit) {
-                $isValid = false;
-                break;
-            }
-        }
-    }
-
-    return $isValid;
-}
 
 function validateUsuario(array $input, bool $adminCreating = false): array
 {
@@ -62,8 +31,8 @@ function validateUsuario(array $input, bool $adminCreating = false): array
         $errors['nome_completo'] = 'Nome completo deve conter entre 3 e 120 caracteres.';
     }
 
-    if (!isValidCPF($cpf)) {
-        $errors['cpf'] = 'CPF invalido.';
+    if (strlen($cpf) !== 11) {
+        $errors['cpf'] = 'CPF deve conter 11 digitos.';
     }
 
     if (!validateDateYmd($dataNascimento)) {
@@ -125,8 +94,8 @@ function validateUsuarioEdit(array $input, bool $adminEditing = false): array
         $errors['nome_completo'] = 'Nome completo deve conter entre 3 e 120 caracteres.';
     }
 
-    if (!isValidCPF($cpf)) {
-        $errors['cpf'] = 'CPF invalido.';
+    if (strlen($cpf) !== 11) {
+        $errors['cpf'] = 'CPF deve conter 11 digitos.';
     }
 
     if (!validateDateYmd($dataNascimento)) {
